@@ -12,6 +12,7 @@ import java.util.stream.Stream;
 @FunctionalInterface
 interface ExFunction<A, R> {
   R apply(A a) throws Throwable;
+
   static <A, R> Function<A, Optional<R>> wrap(ExFunction<A, R> op) {
     return a -> {
       try {
@@ -42,7 +43,7 @@ public class Example {
 
   public static void main(String[] args) /*throws Throwable */{
       List.of("a.txt", "b.txt", "c.txt").stream()
-          .map(Example::getOptLines)
+          .map(ExFunction.wrap(fn -> Files.lines(Path.of(fn))))
           .peek(opt -> {
             if (opt.isEmpty()) {
               System.out.println("something broke");
@@ -51,6 +52,17 @@ public class Example {
           .filter(Optional::isPresent)
           .flatMap(Optional::get)
           .forEach(System.out::println);
+
+//      List.of("a.txt", "b.txt", "c.txt").stream()
+//          .map(Example::getOptLines)
+//          .peek(opt -> {
+//            if (opt.isEmpty()) {
+//              System.out.println("something broke");
+//            }
+//          })
+//          .filter(Optional::isPresent)
+//          .flatMap(Optional::get)
+//          .forEach(System.out::println);
 
 
       //    try {
